@@ -2,6 +2,7 @@ import { config } from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import bcrypt from 'bcryptjs';
 
 config();
 
@@ -304,7 +305,71 @@ const recipes: SeedRecipe[] = [
 ];
 
 async function main() {
-  console.log('🍖 Iniciando Seed de Receitas Ancestrais (Lote Laticínios & Fermentados)...');
+  console.log('� Iniciando seed do banco de dados...');
+
+  // 1. Criar usuários de teste
+  const hashedPassword = await bcrypt.hash('demo123', 10);
+
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@madua.com' },
+    update: {
+      password: hashedPassword,
+      role: 'ADMIN',
+      subscriptionStatus: 'ACTIVE',
+    },
+    create: {
+      email: 'admin@madua.com',
+      name: 'Admin Madua',
+      password: hashedPassword,
+      role: 'ADMIN',
+      subscriptionStatus: 'ACTIVE',
+    },
+  });
+  console.log('✅ Usuário admin@madua.com criado/atualizado');
+
+  const demoUser = await prisma.user.upsert({
+    where: { email: 'demo@madua.com' },
+    update: {
+      password: hashedPassword,
+      role: 'USER',
+      subscriptionStatus: 'ACTIVE',
+    },
+    create: {
+      email: 'demo@madua.com',
+      name: 'Demo User',
+      password: hashedPassword,
+      role: 'USER',
+      subscriptionStatus: 'ACTIVE',
+    },
+  });
+  console.log('✅ Usuário demo@madua.com criado/atualizado');
+
+  const freeUser = await prisma.user.upsert({
+    where: { email: 'free@madua.com' },
+    update: {
+      password: hashedPassword,
+      role: 'USER',
+      subscriptionStatus: 'INACTIVE',
+    },
+    create: {
+      email: 'free@madua.com',
+      name: 'Free User',
+      password: hashedPassword,
+      role: 'USER',
+      subscriptionStatus: 'INACTIVE',
+    },
+  });
+  console.log('✅ Usuário free@madua.com criado/atualizado');
+
+  console.log('');
+  console.log('📝 Credenciais de teste:');
+  console.log('  Admin: admin@madua.com / demo123 (ACTIVE)');
+  console.log('  Demo: demo@madua.com / demo123 (ACTIVE)');
+  console.log('  Free: free@madua.com / demo123 (INACTIVE)');
+  console.log('');
+
+  // 2. Seed de receitas (código existente)
+  console.log('�🍖 Iniciando Seed de Receitas Ancestrais (Lote Laticínios & Fermentados)...');
 
   for (const recipe of recipes) {
     // 1. Gera slug da categoria

@@ -97,9 +97,11 @@ export function AdminSidebar() {
       {/* Header */}
       <div className="p-6 border-b border-zinc-800">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#D4AF37] to-amber-600 flex items-center justify-center">
-            <Shield className="w-5 h-5 text-black" />
-          </div>
+          <img
+            src="/logo/logo-somente-simbolo.png"
+            alt="MADUA Logo"
+            className="w-12 h-12"
+          />
           <div>
             <h1 className="text-lg font-bold text-white">MADUA Admin</h1>
             <p className="text-xs text-zinc-500">Painel de Controlo</p>

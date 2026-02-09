@@ -56,7 +56,11 @@ export function Sidebar() {
         {/* Logo */}
         <div className="flex h-16 items-center border-b border-zinc-200 dark:border-white/5 px-6">
           <Link href="/" className="flex items-center">
-            <h1 className="text-2xl font-bold tracking-wider text-[#D4AF37]">MADUA</h1>
+            <img
+              src="/logo/logo-somente-simbolo.png"
+              alt="MADUA Logo"
+              className="w-14 h-14"
+            />
           </Link>
         </div>
 

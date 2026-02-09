@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
@@ -39,22 +40,29 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#050505] p-4">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
-        <div className="h-full w-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-accent via-transparent to-transparent" />
+        <div className="h-full w-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#D4AF37] via-transparent to-transparent" />
       </div>
 
       <div className="relative w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold italic text-accent mb-2">MADUA</h1>
-          <p className="text-foreground-muted">Plataforma de Aprendizagem</p>
+        {/* Logo e Branding */}
+        <div className="text-center mb-10 sm:mb-12">
+          <Link href="/" className="flex justify-center mb-6">
+            <img
+              src="/logo/logo-somente-simbolo.png"
+              alt="MADUA Logo"
+              className="w-48 sm:w-56 h-48 sm:h-56"
+            />
+          </Link>
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#D4AF37] mb-2">MADUA</h1>
+          <p className="text-gray-400 text-sm sm:text-base">Reconquista da Neantropia</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-[#121212] border border-[#1F1F1F] rounded-lg p-8">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Entrar</h2>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8">
+          <h2 className="text-2xl font-bold text-white mb-6">Entrar</h2>
 
           {errorMsg && (
             <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
@@ -65,11 +73,11 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600" />
                 <input
                   id="email"
                   type="email"
@@ -77,18 +85,18 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-background border border-[#1F1F1F] rounded-lg text-foreground placeholder:text-gray-600 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full pl-10 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder:text-gray-500 focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/50 transition-colors"
                 />
               </div>
             </div>
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                 Senha
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600" />
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -96,12 +104,12 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-10 pr-12 py-3 bg-background border border-[#1F1F1F] rounded-lg text-foreground placeholder:text-gray-600 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full pl-10 pr-12 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder:text-gray-500 focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]/50 transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -112,7 +120,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-accent hover:bg-accent-light text-background font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-[#D4AF37] hover:bg-[#C4A037] text-black font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-6"
             >
               {isLoading ? "Entrando..." : "Entrar"}
             </button>
@@ -121,18 +129,18 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#1F1F1F]"></div>
+              <div className="w-full border-t border-zinc-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-[#121212] text-gray-500">ou</span>
+              <span className="px-2 bg-zinc-900 text-gray-500">ou</span>
             </div>
           </div>
 
           {/* Register Link */}
           <div className="text-center">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-400">
               Não tem uma conta?{" "}
-              <a href="/register" className="text-accent hover:text-accent-light font-medium">
+              <a href="/register" className="text-[#D4AF37] hover:text-[#C4A037] font-semibold transition-colors">
                 Criar conta
               </a>
             </p>
@@ -140,10 +148,10 @@ export default function LoginPage() {
         </div>
 
         {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-[#121212] border border-[#1F1F1F] rounded-lg">
-          <p className="text-xs text-gray-500 mb-2 font-semibold">Credenciais de Demo:</p>
-          <p className="text-xs text-gray-600">Email: demo@madua.com</p>
-          <p className="text-xs text-gray-600">Senha: demo123</p>
+        <div className="mt-6 p-4 bg-zinc-900 border border-zinc-800 rounded-xl">
+          <p className="text-xs font-semibold text-gray-400 mb-2">Credenciais de Demo:</p>
+          <p className="text-xs text-gray-500">Email: demo@madua.com</p>
+          <p className="text-xs text-gray-500">Senha: demo123</p>
         </div>
       </div>
     </div>
