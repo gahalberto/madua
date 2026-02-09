@@ -348,7 +348,7 @@ async function main() {
       update: {},
       create: {
         postId: post.id,
-        ingredients: recipe.ingredients, // O Prisma vai salvar como JSON array
+        ingredients: JSON.stringify(recipe.ingredients),
         instructions: JSON.stringify(recipe.instructions),
         prepTime: recipe.prepTime,
         difficulty: recipe.difficulty,
