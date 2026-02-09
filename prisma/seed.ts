@@ -307,7 +307,15 @@ async function main() {
   console.log('🍖 Iniciando Seed de Receitas Ancestrais (Lote Laticínios & Fermentados)...');
 
   for (const recipe of recipes) {
-    // 1. Cria o Post (Blog Entry)
+    // 1. Gera slug da categoria
+    const categorySlug = recipe.category
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+
+    // 2. Cria o Post (Blog Entry)
     const post = await prisma.post.upsert({
       where: { slug: recipe.slug },
       update: {},
@@ -317,7 +325,15 @@ async function main() {
         excerpt: recipe.excerpt,
         content: recipe.content,
         image: recipe.image,
-        category: recipe.category,
+        category: {
+          connectOrCreate: {
+            where: { slug: categorySlug },
+            create: {
+              name: recipe.category,
+              slug: categorySlug,
+            },
+          },
+        },
         isPublished: true,
         isPremium: false, // Estratégia Isca de SEO
         // Metadados de SEO
