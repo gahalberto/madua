@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { Eye, EyeOff, Lock, Calendar, Plus, Edit, ChefHat } from 'lucide-react';
 import Image from 'next/image';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPostsPage() {
   const posts = await getAllPosts();
 

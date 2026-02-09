@@ -4,7 +4,7 @@
 import { ModuleCompletionToast, useModuleCompletion } from '@/components/module-completion-toast';
 
 function ExemploUsoConclusaoModulo() {
-  const { showToast, moduleName, closeToast } = useModuleCompletion();
+  const { showToast, moduleName, closeToast, celebrate } = useModuleCompletion();
 
   // Simular conclusão de módulo (você deve chamar isso quando detectar que todas as aulas foram completadas)
   /* Exemplo:
@@ -20,9 +20,23 @@ function ExemploUsoConclusaoModulo() {
   };
   */
 
+  const handleDemoCompletion = () => {
+    if (checkIfModuleIsComplete()) {
+      celebrate('Módulo 1: Introdução à Sobrevivência');
+    }
+  };
+
   return (
     <div>
       {/* Seu conteúdo da página */}
+
+      <button
+        type="button"
+        onClick={handleDemoCompletion}
+        className="rounded-lg bg-[#D4AF37] px-4 py-2 text-sm font-semibold text-black"
+      >
+        Simular conclusão de módulo
+      </button>
       
       {/* Toast de conclusão */}
       <ModuleCompletionToast 

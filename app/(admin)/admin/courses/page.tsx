@@ -3,6 +3,8 @@ import { BookOpen, Plus, Eye, EyeOff, Layers, Lock, Unlock } from 'lucide-react'
 import Link from 'next/link';
 import { CourseActions } from '@/components/course-actions';
 
+export const dynamic = 'force-dynamic';
+
 export default async function CoursesPage() {
   const courses = await getAllCourses();
 

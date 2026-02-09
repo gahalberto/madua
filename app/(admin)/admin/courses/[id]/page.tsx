@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { EditCourseForm } from '@/components/edit-course-form';
 import { ModulesManager } from '@/components/modules-manager';
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditCoursePage({ params }: { params: { id: string } }) {
   const course = await getCourseWithModules(params.id);
 
