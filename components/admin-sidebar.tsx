@@ -10,7 +10,6 @@ import {
   CreditCard,
   Settings,
   LogOut,
-  Shield,
   BarChart3,
   Lightbulb,
   Play,
