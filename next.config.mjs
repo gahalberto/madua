@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Configuração essencial para deploy em VPS
+  output: 'standalone',
+  
   images: {
     remotePatterns: [
       {
@@ -11,6 +14,12 @@ const nextConfig = {
     ],
     unoptimized: false,
   },
+  
+  // Garante que os arquivos estáticos sejam gerados corretamente
+  generateEtags: true,
+  
+  // Compressão de assets
+  compress: true,
 };
 
 export default nextConfig;

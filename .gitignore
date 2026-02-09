@@ -29,7 +29,6 @@ yarn-error.log*
 .env*.local
 .env
 
-
 # vercel
 .vercel
 
@@ -41,3 +40,7 @@ next-env.d.ts
 
 # uploads
 /public/uploads/
+
+# PM2 logs
+/logs/
+*.log
