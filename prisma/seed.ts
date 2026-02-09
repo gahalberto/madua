@@ -316,6 +316,7 @@ async function main() {
       password: hashedPassword,
       role: 'ADMIN',
       subscriptionStatus: 'ACTIVE',
+      emailVerified: new Date(),
     },
     create: {
       email: 'admin@madua.com',
@@ -323,6 +324,7 @@ async function main() {
       password: hashedPassword,
       role: 'ADMIN',
       subscriptionStatus: 'ACTIVE',
+      emailVerified: new Date(),
     },
   });
   console.log('✅ Usuário admin@madua.com criado/atualizado');
@@ -333,6 +335,7 @@ async function main() {
       password: hashedPassword,
       role: 'USER',
       subscriptionStatus: 'ACTIVE',
+      emailVerified: new Date(),
     },
     create: {
       email: 'demo@madua.com',
@@ -340,6 +343,7 @@ async function main() {
       password: hashedPassword,
       role: 'USER',
       subscriptionStatus: 'ACTIVE',
+      emailVerified: new Date(),
     },
   });
   console.log('✅ Usuário demo@madua.com criado/atualizado');
@@ -350,6 +354,7 @@ async function main() {
       password: hashedPassword,
       role: 'USER',
       subscriptionStatus: 'INACTIVE',
+      emailVerified: new Date(),
     },
     create: {
       email: 'free@madua.com',
@@ -357,6 +362,7 @@ async function main() {
       password: hashedPassword,
       role: 'USER',
       subscriptionStatus: 'INACTIVE',
+      emailVerified: new Date(),
     },
   });
   console.log('✅ Usuário free@madua.com criado/atualizado');

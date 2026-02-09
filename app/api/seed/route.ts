@@ -26,6 +26,7 @@ export async function POST() {
         email: demoEmail,
         password: hashedPassword,
         role: "USER",
+        emailVerified: new Date(),
       },
     });
 
