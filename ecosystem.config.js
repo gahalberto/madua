@@ -10,7 +10,7 @@ module.exports = {
       max_memory_restart: '1G', // Reinicia a app se exceder 1GB de memória (segurança para VPS)
       env: {
         NODE_ENV: 'production',
-        PORT: 3000,
+        PORT: 3001,
       },
     },
   ],
