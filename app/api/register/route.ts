@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { sendVerificationEmail, createVerificationToken } from "@/lib/mail";
 
 export async function POST(request: Request) {
   try {
@@ -46,14 +47,34 @@ export async function POST(request: Request) {
       },
     });
 
+    // Criar token de verificação
+    const token = await createVerificationToken(email);
+
+    // Criar URL de verificação
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const verificationUrl = `${baseUrl}/api/auth/verify-email?token=${token}&email=${encodeURIComponent(email)}`;
+
+    // Enviar e-mail de verificação
+    const emailResult = await sendVerificationEmail({
+      email,
+      verificationUrl,
+      userName: name,
+    });
+
+    if (!emailResult.success) {
+      console.error("Failed to send verification email:", emailResult.error);
+      // Não falhar o registro se o e-mail não for enviado
+    }
+
     return NextResponse.json(
       { 
-        message: "Usuário criado com sucesso",
+        message: "Usuário criado com sucesso. Verifique seu e-mail para ativar a conta.",
         user: {
           id: user.id,
           name: user.name,
           email: user.email,
-        }
+        },
+        emailSent: emailResult.success,
       },
       { status: 201 }
     );

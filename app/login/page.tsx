@@ -1,18 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Lock, Mail, Eye, EyeOff } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setError] = useState("");
+  const [successMsg, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Verificar mensagens de URL
+  useEffect(() => {
+    const verified = searchParams.get("verified");
+    const error = searchParams.get("error");
+
+    if (verified === "true") {
+      setSuccess("E-mail verificado com sucesso! Faça login para continuar.");
+    } else if (error === "invalid_token") {
+      setError("Link de verificação inválido.");
+    } else if (error === "token_expired") {
+      setError("Link de verificação expirado. Solicite um novo link.");
+    } else if (error === "verification_failed") {
+      setError("Erro ao verificar e-mail. Tente novamente.");
+    } else if (error === "invalid_verification_link") {
+      setError("Link de verificação inválido.");
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,8 +84,16 @@ export default function LoginPage() {
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8">
           <h2 className="text-2xl font-bold text-white mb-6">Entrar</h2>
 
+          {successMsg && (
+            <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-start gap-2">
+              <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-green-400">{successMsg}</p>
+            </div>
+          )}
+
           {errorMsg && (
-            <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+            <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-2">
+              <XCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-red-400">{errorMsg}</p>
             </div>
           )}
@@ -155,5 +183,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#050505] flex items-center justify-center"><p className="text-white">Carregando...</p></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

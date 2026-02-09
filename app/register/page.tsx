@@ -1,15 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, Mail, User, Eye, EyeOff, Phone, Calendar } from "lucide-react";
+import { Lock, Mail, User, Eye, EyeOff, Phone, Calendar, CheckCircle } from "lucide-react";
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import './phone-input.css';
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +15,7 @@ export default function RegisterPage() {
   const [birthDate, setBirthDate] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,7 +43,8 @@ export default function RegisterPage() {
       if (!response.ok) {
         setError(data.error || "Erro ao criar conta");
       } else {
-        router.push("/login?registered=true");
+        setSuccess(true);
+        // Não redireciona imediatamente, mostra mensagem de verificação
       }
     } catch {
       setError("Ocorreu um erro. Tente novamente.");
@@ -78,11 +78,34 @@ export default function RegisterPage() {
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8">
           <h2 className="text-2xl font-bold text-white mb-6">Criar Conta</h2>
 
-          {error && (
-            <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-              <p className="text-sm text-red-400">{error}</p>
+          {success ? (
+            <div className="text-center py-8">
+              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-white mb-3">
+                Conta Criada com Sucesso!
+              </h3>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Enviamos um e-mail de verificação para{" "}
+                <span className="text-[#D4AF37] font-semibold">{email}</span>.
+                <br />
+                <br />
+                Verifique sua caixa de entrada (e spam) e clique no link para
+                ativar sua conta na Madua.
+              </p>
+              <Link
+                href="/login"
+                className="inline-block px-6 py-3 bg-[#D4AF37] hover:bg-[#C4A037] text-black font-bold rounded-lg transition-colors"
+              >
+                Ir para Login
+              </Link>
             </div>
-          )}
+          ) : (
+            <>
+              {error && (
+                <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <p className="text-sm text-red-400">{error}</p>
+                </div>
+              )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name Input */}
@@ -218,6 +241,8 @@ export default function RegisterPage() {
               </a>
             </p>
           </div>
+          </>
+          )}
         </div>
       </div>
     </div>
