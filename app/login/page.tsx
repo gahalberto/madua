@@ -47,7 +47,11 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        setError("Email ou senha inválidos");
+        if (result.error === "EMAIL_NOT_VERIFIED") {
+          setError("Confirme seu e-mail antes de entrar. Verifique a caixa de entrada e o spam.");
+        } else {
+          setError("Email ou senha inválidos");
+        }
       } else {
         router.push("/dashboard");
         router.refresh();

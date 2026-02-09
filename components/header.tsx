@@ -12,7 +12,8 @@ export function Header() {
   const { data: session } = useSession();
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: "/login" });
+    const callbackUrl = typeof window !== "undefined" ? `${window.location.origin}/login` : "/login";
+    await signOut({ callbackUrl });
   };
 
   return (
