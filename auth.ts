@@ -6,9 +6,23 @@ import bcrypt from "bcryptjs";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 dias
+    updateAge: 24 * 60 * 60, // Atualizar a cada 24 horas
   },
   pages: {
     signIn: "/login",
+  },
+  callbacks: {
+    async authorized({ request, auth }) {
+      // Verificar autenticação em rotas protegidas
+      const { pathname } = request.nextUrl;
+      
+      if (pathname.startsWith('/api/admin') || pathname.startsWith('/admin')) {
+        return !!auth?.user;
+      }
+      
+      return true;
+    },
   },
   providers: [
     Credentials({
@@ -74,4 +88,39 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
+  // Configurações de cookie para produção
+  cookies: {
+    sessionToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        // Em produção, definir o domain corretamente
+        ...(process.env.NODE_ENV === 'production' && {
+          domain: process.env.NEXTAUTH_URL?.replace('https://', '').replace('http://', '').split(':')[0],
+        }),
+      },
+    },
+    callbackUrl: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+      },
+    },
+    csrfToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+      },
+    },
+  },
 });
+

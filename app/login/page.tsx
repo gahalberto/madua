@@ -52,11 +52,43 @@ function LoginForm() {
         } else {
           setError("Email ou senha inválidos");
         }
-      } else {
-        router.push("/dashboard");
-        router.refresh();
+      } else if (result?.ok) {
+        // Adicionar um pequeno delay para garantir que a sessão foi criada
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Verificar se a sessão foi criada com sucesso
+        const sessionCheckRetries = 3;
+        let sessionVerified = false;
+        
+        for (let i = 0; i < sessionCheckRetries; i++) {
+          try {
+            const sessionResponse = await fetch("/api/auth/session");
+            if (sessionResponse.ok) {
+              const session = await sessionResponse.json();
+              if (session?.user?.email) {
+                sessionVerified = true;
+                break;
+              }
+            }
+          } catch (err) {
+            console.error("Session check failed:", err);
+          }
+          
+          if (i < sessionCheckRetries - 1) {
+            await new Promise(resolve => setTimeout(resolve, 300));
+          }
+        }
+        
+        if (sessionVerified) {
+          // Usar router.push com refresh para forçar a atualização em produção
+          await router.push("/dashboard");
+          router.refresh();
+        } else {
+          setError("Falha ao criar sessão. Por favor, tente novamente.");
+        }
       }
-    } catch {
+    } catch (error) {
+      console.error("Login error:", error);
       setError("Ocorreu um erro. Tente novamente.");
     } finally {
       setIsLoading(false);
