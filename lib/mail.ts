@@ -48,7 +48,7 @@ export async function sendVerificationEmail({
   userName,
 }: SendVerificationEmailParams) {
   try {
-    const html = render(
+    const html = await render(
       WelcomeMaduaEmail({
         userEmail: email,
         verificationUrl,
@@ -89,7 +89,7 @@ export async function sendWelcomeEmail({
   userName,
 }: SendWelcomeEmailParams) {
   try {
-    const html = render(
+    const html = await render(
       WelcomeMaduaEmail({
         userEmail: email,
         verificationUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
@@ -134,7 +134,7 @@ export async function sendPasswordResetEmail({
   try {
     // Você pode criar um template separado para reset de senha
     // Por enquanto, usando o template de welcome adaptado
-    const html = render(
+    const html = await render(
       WelcomeMaduaEmail({
         userEmail: email,
         verificationUrl: resetUrl,
