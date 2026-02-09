@@ -26,10 +26,10 @@ export function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-amber-600">MADUA</span>
+            <span className="text-xl sm:text-2xl font-bold text-amber-600">MADUA</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -82,7 +82,7 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-white/10">
+          <div className="md:hidden py-4 border-t border-white/10 bg-black/95 backdrop-blur-md">
             <div className="flex flex-col space-y-4">
               <Link
                 href="/sobre"
