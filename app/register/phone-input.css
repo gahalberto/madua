@@ -1,0 +1,70 @@
+/* Estilos customizados para PhoneInput */
+.phone-input {
+  position: relative;
+}
+
+.phone-input .PhoneInputInput {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 7rem;
+  background-color: #0A0A0A;
+  border: 1px solid #1F1F1F;
+  border-radius: 0.5rem;
+  color: #FFFFFF;
+  font-size: 1rem;
+}
+
+.phone-input .PhoneInputInput::placeholder {
+  color: #4B5563;
+}
+
+.phone-input .PhoneInputInput:focus {
+  outline: none;
+  border-color: #D4AF37;
+  box-shadow: 0 0 0 1px #D4AF37;
+}
+
+.phone-input .PhoneInputCountry {
+  position: absolute;
+  left: 2.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
+
+.phone-input .PhoneInputCountryIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 2px;
+  display: block;
+}
+
+.phone-input .PhoneInputCountrySelect {
+  background-color: transparent;
+  border: none;
+  color: #FFFFFF;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+.phone-input .PhoneInputCountrySelect:focus {
+  outline: none;
+}
+
+.phone-input .PhoneInputCountrySelectArrow {
+  color: #9CA3AF;
+  opacity: 0.8;
+  width: 0.375rem;
+  height: 0.375rem;
+  margin-left: 0.25rem;
+  display: inline-block;
+}
+
+.phone-input .PhoneInputCountryIconImg {
+  display: block;
+}

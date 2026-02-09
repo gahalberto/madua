@@ -1,0 +1,13 @@
+import { getCommentsByLessonId } from '@/app/actions/comments';
+import { LessonPageClient } from './lesson-client';
+
+export default async function LessonPage({
+  params,
+}: {
+  params: { courseId: string; lessonId: string };
+}) {
+  // Buscar comentários do servidor
+  const comments = await getCommentsByLessonId(params.lessonId);
+
+  return <LessonPageClient params={params} initialComments={comments} />;
+}
