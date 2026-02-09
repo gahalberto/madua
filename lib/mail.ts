@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { render } from "@react-email/render";
 import { WelcomeMaduaEmail } from "@/emails/WelcomeMadua";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
@@ -47,15 +48,19 @@ export async function sendVerificationEmail({
   userName,
 }: SendVerificationEmailParams) {
   try {
+    const html = render(
+      WelcomeMaduaEmail({
+        userEmail: email,
+        verificationUrl,
+        userName,
+      })
+    );
+
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "Madua <onboarding@madua.com>",
       to: email,
       subject: "Convocatória Madua: Confirme a sua Lealdade.",
-      react: WelcomeMaduaEmail({
-        userEmail: email,
-        verificationUrl,
-        userName,
-      }),
+      html,
     });
 
     if (error) {
@@ -84,15 +89,19 @@ export async function sendWelcomeEmail({
   userName,
 }: SendWelcomeEmailParams) {
   try {
+    const html = render(
+      WelcomeMaduaEmail({
+        userEmail: email,
+        verificationUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+        userName,
+      })
+    );
+
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "Madua <welcome@madua.com>",
       to: email,
       subject: "Bem-vindo ao Comando Madua",
-      react: WelcomeMaduaEmail({
-        userEmail: email,
-        verificationUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
-        userName,
-      }),
+      html,
     });
 
     if (error) {
@@ -125,15 +134,19 @@ export async function sendPasswordResetEmail({
   try {
     // Você pode criar um template separado para reset de senha
     // Por enquanto, usando o template de welcome adaptado
+    const html = render(
+      WelcomeMaduaEmail({
+        userEmail: email,
+        verificationUrl: resetUrl,
+        userName,
+      })
+    );
+
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || "Madua <security@madua.com>",
       to: email,
       subject: "Madua: Recuperação de Acesso",
-      react: WelcomeMaduaEmail({
-        userEmail: email,
-        verificationUrl: resetUrl,
-        userName,
-      }),
+      html,
     });
 
     if (error) {
