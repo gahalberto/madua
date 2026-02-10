@@ -62,6 +62,11 @@ export const metadata: Metadata = {
     site: '@madua',
     images: ['/logo/madua-og.jpg'],
   },
+  icons: {
+    icon: '/logo/logo-somente-simbolo.png',
+    shortcut: '/logo/logo-somente-simbolo.png',
+    apple: '/logo/logo-somente-simbolo.png',
+  },
   robots: {
     index: true,
     follow: true,
