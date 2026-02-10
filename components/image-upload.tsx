@@ -178,19 +178,3 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
     </div>
   );
 }
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {error && (
-        <p className="text-sm text-red-400 flex items-center gap-2">
-          <X className="w-4 h-4" />
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
