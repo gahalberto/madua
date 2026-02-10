@@ -3,42 +3,54 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export default async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // 1. Tenta pegar o token com as configurações EXATAS de produção
   const token = await getToken({
     req: request,
-    secret: process.env.NEXTAUTH_SECRET,
+    // Tenta ler AUTH_SECRET (v5) ou NEXTAUTH_SECRET (v4)
+    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+    // FORÇA o uso de cookie seguro (essencial em VPS com HTTPS)
+    secureCookie: true, 
+    // FORÇA o nome exato do cookie que vimos no seu diagnóstico
+    cookieName: "__Secure-next-auth.session-token", 
   });
 
-  const pathname = request.nextUrl.pathname;
+  console.log(`[Middleware] Path: ${pathname} | Token encontrado: ${!!token}`);
 
-  // Rotas públicas - sempre permitidas
-  const publicRoutes = [
-    '/',
-    '/sobre',
-    '/receitas',
-    '/blog',
-    '/termos',
-    '/login',
-    '/register',
-    '/upgrade',
-    '/assinatura',
-  ];
+  // 2. Definição de Rotas Públicas
+  // Dica: Use startsWith para liberar sub-rotas (ex: /blog/post-1)
+  const isPublicRoute = 
+    pathname === '/' ||
+    pathname.startsWith('/sobre') ||
+    pathname.startsWith('/receitas') ||
+    pathname.startsWith('/blog') ||
+    pathname.startsWith('/termos') ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/register') ||
+    pathname.startsWith('/upgrade') ||
+    pathname.startsWith('/assinatura') ||
+    pathname.startsWith('/api/') ||     // Libera APIs
+    pathname.startsWith('/_next') ||    // Libera arquivos internos do Next
+    pathname.startsWith('/static') ||   // Libera pasta static
+    pathname.includes('.');             // Libera arquivos (imagens, favicon, etc)
 
-  if (
-    publicRoutes.includes(pathname) ||
-    pathname.startsWith('/api/') ||
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon.ico')
-  ) {
+  // 3. Lógica de Redirecionamento
+  
+  // Se for rota pública, deixa passar
+  if (isPublicRoute) {
     return NextResponse.next();
   }
 
-  // Se não estiver logado, redireciona para login
+  // Se NÃO for pública e NÃO tiver token -> Login
   if (!token) {
+    console.log(`[Middleware] Acesso negado a ${pathname}. Redirecionando para login.`);
     const url = new URL('/login', request.url);
     url.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(url);
   }
 
+  // Se tiver token, deixa passar
   return NextResponse.next();
 }
 

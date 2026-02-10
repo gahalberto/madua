@@ -3,6 +3,12 @@ const nextConfig = {
   // Configuração essencial para deploy em VPS
   output: 'standalone',
   
+  // Permitir requisições cross-origin em desenvolvimento
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 5,
+  },
+  
   images: {
     remotePatterns: [
       {
