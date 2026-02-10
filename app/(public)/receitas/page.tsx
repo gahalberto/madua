@@ -2,11 +2,51 @@ import { getPublishedPosts } from '@/app/actions/posts';
 import { Clock, ChefHat, Lock, Users, Flame, ArrowRight } from 'lucide-react';
 import { RecipeSearch } from '@/components/recipe-search';
 import { normalizeString } from '@/lib/utils';
+import type { Metadata } from 'next';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Receitas | Madua - Nutrição e Receitas para o Homem Moderno',
   description:
     'Receitas saudáveis com informação nutricional completa. Alimentação inteligente para performance e saúde.',
+  keywords: 'receitas saudáveis, nutrição ancestral, alimentação masculina, receitas fitness, culinária saudável',
+  alternates: {
+    canonical: 'https://madua.pt/receitas',
+  },
+  openGraph: {
+    title: 'Receitas | Madua - Nutrição e Receitas para o Homem Moderno',
+    description: 'Receitas saudáveis com informação nutricional completa. Alimentação inteligente para performance e saúde.',
+    url: 'https://madua.pt/receitas',
+    siteName: 'Madua',
+    images: [
+      {
+        url: 'https://madua.pt/logo/madua-og.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Madua - Receitas',
+      },
+    ],
+    locale: 'pt_PT',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Receitas | Madua',
+    description: 'Receitas saudáveis com informação nutricional completa.',
+    images: ['https://madua.pt/logo/madua-og.jpg'],
+    creator: '@madua',
+    site: '@madua',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 interface PageProps {

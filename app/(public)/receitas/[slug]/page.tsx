@@ -31,17 +31,84 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
+  const title = post.metaTitle || `${post.title} | Madua`;
+  const description =
+    post.metaDescription ||
+    post.excerpt ||
+    `Receita completa de ${post.title} com informação nutricional e modo de preparação detalhado.`;
+  const imageUrl = post.image || 'https://madua.pt/logo/madua-og.jpg';
+  const url = `https://madua.pt/receitas/${params.slug}`;
+
+  // Calcular tempo total para descrição
+  const totalTime = (post.recipe.prepTime || 0) + (post.recipe.cookTime || 0);
+  const timeText = totalTime ? ` | ${totalTime} min` : '';
+  const servingsText = post.recipe.servings ? ` | ${post.recipe.servings} porções` : '';
+  const difficultyText = post.recipe.difficulty ? ` | ${post.recipe.difficulty}` : '';
+
   return {
-    title: post.metaTitle || `${post.title} - Receita | Madua`,
-    description:
-      post.metaDescription ||
-      post.excerpt ||
-      `Receita completa de ${post.title} com informação nutricional e modo de preparação detalhado.`,
+    title,
+    description,
+    keywords: [
+      'receitas',
+      'culinária ancestral',
+      'alimentação saudável',
+      'madua',
+      post.category?.name,
+      post.recipe.difficulty,
+      ...(post.metaTitle ? [post.title] : []),
+    ].filter(Boolean).join(', '),
+    authors: [{ name: 'Madua' }],
+    creator: 'Madua',
+    publisher: 'Madua',
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
-      title: post.metaTitle || post.title,
-      description: post.metaDescription || post.excerpt || undefined,
-      images: post.image ? [post.image] : [],
+      title,
+      description,
+      url,
+      siteName: 'Madua',
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      locale: 'pt_PT',
       type: 'article',
+      publishedTime: post.createdAt.toISOString(),
+      modifiedTime: post.updatedAt.toISOString(),
+      authors: ['Madua'],
+      tags: [post.category?.name, post.recipe.difficulty].filter(Boolean),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
+      creator: '@madua',
+      site: '@madua',
+    },
+    robots: {
+      index: post.isPublished,
+      follow: post.isPublished,
+      googleBot: {
+        index: post.isPublished,
+        follow: post.isPublished,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    other: {
+      'recipe:author': 'Madua',
+      'recipe:published_time': post.createdAt.toISOString(),
+      'recipe:modified_time': post.updatedAt.toISOString(),
+      'recipe:category': post.category?.name || 'Receita',
+      ...(totalTime && { 'recipe:duration': `PT${totalTime}M` }),
+      ...(post.recipe.servings && { 'recipe:servings': post.recipe.servings.toString() }),
     },
   };
 }
@@ -83,8 +150,14 @@ export default async function ReceitaPage({ params }: PageProps) {
     author: {
       '@type': 'Organization',
       name: 'Madua',
+      url: 'https://madua.pt',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://madua.pt/logo/logo-dourado.png',
+      },
     },
     datePublished: post.createdAt.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
     description: post.excerpt || post.title,
     prepTime: post.recipe.prepTime ? `PT${post.recipe.prepTime}M` : undefined,
     cookTime: post.recipe.cookTime ? `PT${post.recipe.cookTime}M` : undefined,
@@ -92,7 +165,7 @@ export default async function ReceitaPage({ params }: PageProps) {
     recipeYield: post.recipe.servings ? `${post.recipe.servings} porções` : undefined,
     recipeCategory: post.category?.name || 'Receita',
     recipeCuisine: 'Portuguesa',
-    keywords: post.category?.name || 'Receita',
+    keywords: [post.category?.name, post.recipe.difficulty, 'receita saudável', 'madua'].filter(Boolean).join(', '),
     // Apenas incluir ingredientes e instruções completos se não for premium OU se o usuário tiver acesso
     recipeIngredient: !post.isPremium || hasAccess ? ingredients.map((i) => `${i.quantity} ${i.unit} ${i.name}`) : ['Conteúdo exclusivo para membros'],
     recipeInstructions: !post.isPremium || hasAccess
@@ -121,14 +194,73 @@ export default async function ReceitaPage({ params }: PageProps) {
       ratingValue: '4.8',
       ratingCount: '127',
     },
+    video: post.recipe.videoUrl ? {
+      '@type': 'VideoObject',
+      name: post.title,
+      description: post.excerpt || post.title,
+      thumbnailUrl: post.image,
+      contentUrl: post.recipe.videoUrl,
+    } : undefined,
+    isAccessibleForFree: !post.isPremium,
+  };
+
+  // Breadcrumb Schema
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Início',
+        item: 'https://madua.pt',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Receitas',
+        item: 'https://madua.pt/receitas',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: `https://madua.pt/receitas/${params.slug}`,
+      },
+    ],
+  };
+
+  // Organization Schema
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Madua',
+    url: 'https://madua.pt',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://madua.pt/logo/logo-dourado.png',
+    },
+    sameAs: [
+      'https://twitter.com/madua',
+      'https://instagram.com/madua',
+      'https://facebook.com/madua',
+    ],
   };
 
   return (
     <>
-      {/* JSON-LD Script para SEO */}
+      {/* JSON-LD Scripts para SEO */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(recipeSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
 
       <div className="min-h-screen bg-[#0A0A0A]">
