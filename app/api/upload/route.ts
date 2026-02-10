@@ -83,24 +83,8 @@ export async function POST(request: NextRequest) {
     
     const fileName = `${timestamp}-${cleanName}.${ext}`;
 
-    // Definir caminho de upload
-    // Em produção (standalone), process.cwd() aponta para .next/standalone
-    // Precisamos salvar em /var/www/madua/public ou similar
-    let uploadDir: string;
-    
-    const cwd = process.cwd();
-    if (cwd.includes('.next/standalone')) {
-      // Em produção: salvar em /var/www/madua/public/uploads/receitas
-      uploadDir = join(cwd, '..', '..', 'public', 'uploads', 'receitas');
-      console.log('Modo production (standalone) detectado');
-    } else {
-      // Em desenvolvimento: salvar em public/uploads/receitas
-      uploadDir = join(cwd, 'public', 'uploads', 'receitas');
-      console.log('Modo desenvolvimento detectado');
-    }
-
-    console.log('Diretório de upload:', uploadDir);
-
+    // Criar diretório se não existir
+    const uploadDir = join(process.cwd(), 'public', 'uploads', 'receitas');
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true });
     }
@@ -131,7 +115,6 @@ export async function POST(request: NextRequest) {
       originalSize: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
       bufferSize: `${(buffer.length / 1024 / 1024).toFixed(2)}MB`,
       bufferSizeBytes: buffer.length,
-      uploadDir,
       path: filePath,
       publicUrl,
     });

@@ -5,12 +5,7 @@ import bcrypt from "bcryptjs";
 import { authConfig } from "./auth.config";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  ...authConfig,
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
+  ...authConfig, // <--- Aqui ele puxa a config de cookies correta do arquivo acima
   providers: [
     Credentials({
       name: "credentials",
