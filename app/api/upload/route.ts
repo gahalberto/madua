@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File;
 
     if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+      return NextResponse.json({ error: 'Nenhum arquivo enviado' }, { status: 400 });
     }
 
     // Validar tipo de arquivo
@@ -21,23 +21,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validar tamanho (máximo 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
+    // Validar tamanho (máximo 10MB antes da compressão)
+    const maxSizeOriginal = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSizeOriginal) {
       return NextResponse.json(
-        { error: 'Arquivo muito grande. Tamanho máximo: 5MB' },
+        { error: 'Arquivo muito grande. Tamanho máximo: 10MB' },
         { status: 400 }
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    let buffer = Buffer.from(await file.arrayBuffer());
+
+    // Se o arquivo for muito grande, avisar ao cliente
+    if (buffer.length > 5 * 1024 * 1024) {
+      console.warn(`Arquivo grande: ${file.name} (${Math.round(buffer.length / 1024 / 1024)}MB). Recomenda-se comprimir antes de enviar.`);
+    }
+
+    // Validar tamanho final (máximo 8MB)
+    const maxSizeFinal = 8 * 1024 * 1024;
+    if (buffer.length > maxSizeFinal) {
+      return NextResponse.json(
+        { error: 'Arquivo muito grande. Por favor, comprima a imagem antes de enviar (máximo 8MB).' },
+        { status: 400 }
+      );
+    }
 
     // Criar nome único para o arquivo
     const timestamp = Date.now();
-    // Extrair extensão
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    // Criar nome limpo a partir do nome original (sem extensão)
     const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
     const cleanName = nameWithoutExt
       .toLowerCase()
@@ -45,7 +56,7 @@ export async function POST(request: NextRequest) {
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '')
-      .substring(0, 50) || 'image'; // Fallback para 'image' se estiver vazio
+      .substring(0, 50) || 'image';
     
     const fileName = `${timestamp}-${cleanName}.${ext}`;
 
@@ -62,7 +73,7 @@ export async function POST(request: NextRequest) {
     // Retornar URL pública
     const publicUrl = `/uploads/receitas/${fileName}`;
     
-    console.log('File uploaded successfully:', {
+    console.log('Arquivo enviado com sucesso:', {
       originalName: file.name,
       savedAs: fileName,
       size: file.size,
@@ -72,7 +83,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: publicUrl }, { status: 200 });
   } catch (error) {
-    console.error('Error uploading file:', error);
-    return NextResponse.json({ error: 'Erro ao fazer upload do arquivo' }, { status: 500 });
+    console.error('Erro ao fazer upload:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao fazer upload';
+    return NextResponse.json(
+      { error: `Erro ao fazer upload do arquivo: ${errorMessage}` },
+      { status: 500 }
+    );
   }
 }
