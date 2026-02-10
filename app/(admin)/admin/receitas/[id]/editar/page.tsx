@@ -56,6 +56,9 @@ export default function EditarReceitaPage({ params }: { params: { id: string } }
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fats, setFats] = useState('');
+  
+  // ID do post (não o slug)
+  const [postId, setPostId] = useState('');
 
   useEffect(() => {
     loadCategories();
@@ -124,6 +127,7 @@ export default function EditarReceitaPage({ params }: { params: { id: string } }
       const result = await getPostBySlug(params.id);
       if (result.success && result.post) {
         const post = result.post;
+        setPostId(post.id); // Guardar o ID do post
         setTitle(post.title);
         setSlug(post.slug);
         setCategoryId(post.categoryId || '');
@@ -206,8 +210,14 @@ export default function EditarReceitaPage({ params }: { params: { id: string } }
     setSaving(true);
     setError('');
 
+    if (!postId) {
+      setError('ID do post não encontrado');
+      setSaving(false);
+      return;
+    }
+
     try {
-      const result = await updatePost(params.id, {
+      const result = await updatePost(postId, {
         title,
         slug,
         categoryId: categoryId || undefined,

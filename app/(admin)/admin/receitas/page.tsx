@@ -122,7 +122,8 @@ export default function AdminReceitasPage() {
 
       {/* Table */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-        <table className="w-full">
+        <div className="overflow-x-auto">
+          <table className="w-full">
           <thead className="bg-zinc-800 border-b border-zinc-700">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider">
@@ -222,6 +223,7 @@ export default function AdminReceitasPage() {
             ))}
           </tbody>
         </table>
+        </div>
 
         {receitas.length === 0 && (
           <div className="py-12 text-center text-zinc-400">
