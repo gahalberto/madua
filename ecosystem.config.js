@@ -11,11 +11,9 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3001,
         HOSTNAME: '0.0.0.0',
-        // --- ADICIONE ESTAS LINHAS ABAIXO ---
         AUTH_TRUST_HOST: 'true',
         NEXTAUTH_URL: 'https://madua.com.br',
-        // ------------------------------------
-      },
+     },
       error_file: './logs/pm2-error.log',
       out_file: './logs/pm2-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',

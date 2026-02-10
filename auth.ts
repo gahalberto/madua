@@ -12,18 +12,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/login",
   },
-  callbacks: {
-    async authorized({ request, auth }) {
-      // Verificar autenticação em rotas protegidas
-      const { pathname } = request.nextUrl;
-      
-      if (pathname.startsWith('/api/admin') || pathname.startsWith('/admin')) {
-        return !!auth?.user;
-      }
-      
-      return true;
-    },
-  },
   providers: [
     Credentials({
       name: "credentials",
@@ -70,6 +58,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
+    async authorized({ request, auth }) {
+      // Verificar autenticação em rotas protegidas
+      const { pathname } = request.nextUrl;
+
+      if (pathname.startsWith('/api/admin') || pathname.startsWith('/admin')) {
+        return !!auth?.user;
+      }
+
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
