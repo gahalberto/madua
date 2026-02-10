@@ -11,12 +11,20 @@ interface ImageUploadProps {
 
 // Função para comprimir imagem no navegador
 async function compressImage(file: File): Promise<File> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
+    reader.onerror = () => {
+      console.error('Erro ao ler arquivo');
+      reject(new Error('Erro ao ler arquivo'));
+    };
     reader.onload = (event) => {
       const img = new Image();
       img.src = event.target?.result as string;
+      img.onerror = () => {
+        console.error('Erro ao carregar imagem');
+        reject(new Error('Erro ao carregar imagem'));
+      };
       img.onload = () => {
         const canvas = document.createElement('canvas');
         let width = img.width;
@@ -27,32 +35,62 @@ async function compressImage(file: File): Promise<File> {
         const maxHeight = 1920;
         if (width > maxWidth || height > maxHeight) {
           const ratio = Math.min(maxWidth / width, maxHeight / height);
-          width *= ratio;
-          height *= ratio;
+          width = Math.floor(width * ratio);
+          height = Math.floor(height * ratio);
         }
 
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
+        if (!ctx) {
+          console.warn('Não conseguiu obter contexto do canvas');
+          resolve(file);
+          return;
         }
 
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              const compressedFile = new File([blob], file.name, {
-                type: 'image/jpeg',
-                lastModified: Date.now(),
-              });
-              resolve(compressedFile);
-            } else {
+        try {
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          let blobResolved = false;
+          const timeout = setTimeout(() => {
+            if (!blobResolved) {
+              console.warn('Timeout na compressão, usando arquivo original');
+              blobResolved = true;
               resolve(file);
             }
-          },
-          'image/jpeg',
-          0.85 // Qualidade 85%
-        );
+          }, 5000);
+          
+          canvas.toBlob(
+            (blob) => {
+              clearTimeout(timeout);
+              if (blobResolved) return; // Já resolvido por timeout
+              blobResolved = true;
+
+              if (blob && blob.size > 0) {
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                });
+                console.log(
+                  `Compressão bem-sucedida: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(compressedFile.size / 1024).toFixed(2)}KB`
+                );
+                resolve(compressedFile);
+              } else {
+                console.warn('Blob vazio após compressão, usando arquivo original', {
+                  blobSize: blob?.size || 0,
+                  fileName: file.name,
+                  originalSize: file.size,
+                });
+                resolve(file);
+              }
+            },
+            'image/jpeg',
+            0.85 // Qualidade 85%
+          );
+        } catch (error) {
+          console.error('Erro ao desenhar imagem no canvas:', error);
+          resolve(file);
+        }
       };
     };
   });
@@ -67,6 +105,12 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    console.log('Iniciando upload:', {
+      name: file.name,
+      size: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
+      type: file.type,
+    });
+
     setUploading(true);
     setError('');
 
@@ -74,10 +118,23 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
       // Comprimir imagem se muito grande
       let fileToUpload = file;
       if (file.size > 2 * 1024 * 1024) {
-        console.log(`Comprimindo imagem: ${file.name} (${Math.round(file.size / 1024 / 1024)}MB)`);
-        fileToUpload = await compressImage(file);
-        console.log(`Imagem comprimida para: ${Math.round(fileToUpload.size / 1024 / 1024)}MB`);
+        console.log(`Comprimindo imagem: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+        try {
+          fileToUpload = await compressImage(file);
+          console.log(`Imagem comprimida: ${(fileToUpload.size / 1024).toFixed(2)}KB (${fileToUpload.size} bytes)`);
+        } catch (compressError) {
+          console.warn('Falha na compressão, tentando enviar original:', compressError);
+          fileToUpload = file;
+        }
+      } else {
+        console.log(`Imagem pequena, enviando sem compressão: ${(file.size / 1024).toFixed(2)}KB`);
       }
+
+      console.log('Enviando para servidor:', {
+        fileName: fileToUpload.name,
+        size: `${(fileToUpload.size / 1024).toFixed(2)}KB`,
+        type: fileToUpload.type,
+      });
 
       const formData = new FormData();
       formData.append('file', fileToUpload);
@@ -98,6 +155,11 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
       if (!response.ok) {
         throw new Error(data.error || 'Erro ao fazer upload');
       }
+
+      console.log('Upload bem-sucedido:', {
+        url: data.url,
+        fileName: data.fileName,
+      });
 
       onChange(data.url);
     } catch (err: unknown) {
