@@ -38,12 +38,7 @@ export async function generateMetadata({ params }: PageProps) {
     `Receita completa de ${post.title} com informação nutricional e modo de preparação detalhado.`;
   const imageUrl = post.image || 'https://madua.pt/logo/madua-og.jpg';
   const url = `https://madua.pt/receitas/${params.slug}`;
-
-  // Calcular tempo total para descrição
   const totalTime = (post.recipe.prepTime || 0) + (post.recipe.cookTime || 0);
-  const timeText = totalTime ? ` | ${totalTime} min` : '';
-  const servingsText = post.recipe.servings ? ` | ${post.recipe.servings} porções` : '';
-  const difficultyText = post.recipe.difficulty ? ` | ${post.recipe.difficulty}` : '';
 
   return {
     title,
@@ -194,13 +189,6 @@ export default async function ReceitaPage({ params }: PageProps) {
       ratingValue: '4.8',
       ratingCount: '127',
     },
-    video: post.recipe.videoUrl ? {
-      '@type': 'VideoObject',
-      name: post.title,
-      description: post.excerpt || post.title,
-      thumbnailUrl: post.image,
-      contentUrl: post.recipe.videoUrl,
-    } : undefined,
     isAccessibleForFree: !post.isPremium,
   };
 
