@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let buffer = Buffer.from(await file.arrayBuffer());
+    const buffer = Buffer.from(await file.arrayBuffer());
 
     // Se o arquivo for muito grande, avisar ao cliente
     if (buffer.length > 5 * 1024 * 1024) {
