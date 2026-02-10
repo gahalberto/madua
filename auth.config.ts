@@ -4,25 +4,9 @@ export const authConfig = {
   pages: {
     signIn: "/login",
   },
-  // O SEGREDO É OBRIGATÓRIO AQUI
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
-  
-  // FORÇAR AS CONFIGURAÇÕES DE COOKIE
-  // Isso garante que o Middleware use o mesmo "salt" que criou o cookie
-  useSecureCookies: true,
-  cookies: {
-    sessionToken: {
-      name: `__Secure-next-auth.session-token`, // Força o nome exato que está no seu navegador
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: true,
-        domain: '.madua.com.br' // Garante o domínio
-      }
-    }
+  session: {
+    strategy: "jwt" as const,
   },
-  
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
@@ -30,16 +14,14 @@ export const authConfig = {
       
       if (isOnDashboard) {
         if (isLoggedIn) return true;
-        return false; // Redirect unauthenticated users to login page
+        return false;
       } else if (isLoggedIn) {
-        // Se tentar ir pro login estando logado, manda pro dashboard
         if (nextUrl.pathname === "/login") {
           return Response.redirect(new URL("/dashboard", nextUrl));
         }
       }
       return true;
     },
-    // Precisamos desses callbacks aqui para o tipo bater, mesmo que vazios
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
@@ -55,5 +37,5 @@ export const authConfig = {
       return session;
     }
   },
-  providers: [], // Mantém vazio aqui para compatibilidade com Edge
+  providers: [],
 } satisfies NextAuthConfig;

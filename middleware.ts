@@ -5,15 +5,10 @@ import { getToken } from 'next-auth/jwt';
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Tenta pegar o token com as configurações EXATAS de produção
+  // 1. Tenta pegar o token
   const token = await getToken({
     req: request,
-    // Tenta ler AUTH_SECRET (v5) ou NEXTAUTH_SECRET (v4)
     secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
-    // FORÇA o uso de cookie seguro (essencial em VPS com HTTPS)
-    secureCookie: true, 
-    // FORÇA o nome exato do cookie que vimos no seu diagnóstico
-    cookieName: "__Secure-next-auth.session-token", 
   });
 
   console.log(`[Middleware] Path: ${pathname} | Token encontrado: ${!!token}`);
